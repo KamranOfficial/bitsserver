@@ -1,60 +1,103 @@
-# BitsServer IT Lab — Static Site
+# BitsServer IT Lab — Static Site (Modular Refactor)
 
-A static site (no build step, no framework) for **Cloudflare Pages**.
+Pure static HTML/CSS/JS for Cloudflare Pages. **No build step, no Python,
+no framework** — the browser assembles each page at request time.
 
 ## File structure
+
 ```
-index.html          Main landing page
-404.html            Not-found page
-robots.txt / sitemap.xml
-_headers             Cloudflare Pages security/caching headers
-css/style.css        All styles
-js/hero-scene.js     Real WebGL 3D hero scene (Three.js)
-js/main.js           Scroll effects, nav, counters, form handling
-assets/favicon.svg
+index.html              Homepage — includes header/footer via data-include
+includes/
+  header.html             Single source of truth for site nav
+  footer.html             Single source of truth for footer + addresses
+tools/
+  index.html               Free Tools hub / listing page
+  _template.html            Copy this to create a new coming-soon tool page
+legal/                    (move your existing legal .html files here)
+about.html / contact.html  (apply the same data-include pattern — see below)
+css/style.css
+js/
+  include.js               Fetches header.html/footer.html into the page,
+                             then loads the rest of your scripts in order
+  main.js, hero-scene.js
+assets/
 ```
 
-## Deploy to Cloudflare Pages
-**Option A — drag and drop (fastest):**
-1. Cloudflare dashboard → Workers & Pages → Create → Pages → Upload assets.
-2. Drag this entire folder in. Done — you get a `*.pages.dev` URL immediately.
+## How the modular header/footer works
 
-**Option B — Git (recommended for ongoing edits):**
-1. Push this folder to a GitHub/GitLab repo.
-2. Cloudflare dashboard → Workers & Pages → Create → Pages → Connect to Git.
-3. Build settings: **no build command**, output directory = `/` (root).
-4. Every push to your main branch auto-deploys.
+Every page has two placeholder divs and one script tag instead of the old
+inline header/footer markup and bottom `<script>` tags:
 
-**Custom domain:** Pages project → Custom domains → add `bitsserver.com` / `www.bitsserver.com` and follow the DNS prompts (if your domain is already on Cloudflare, this is a couple of clicks).
+```html
+<div data-include="/includes/header.html"></div>
+...
+<div data-include="/includes/footer.html"></div>
 
-## Things to connect after deploy
+<script src="/js/include.js"
+        data-then="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js,/js/hero-scene.js,/js/main.js">
+</script>
+```
 
-1. **Contact form** (`index.html`, `#contact-form`) — Cloudflare Pages doesn't
-   process form submissions itself. Pick one:
-   - **Formspree / Web3Forms** (no code): create a free endpoint, paste it
-     into the form's `action="..."` attribute.
-   - **Cloudflare Pages Function** (stays on your domain): add
-     `/functions/api/contact.js` that reads the POST body and sends it via
-     an email API, then set `action="/api/contact"`.
-   Until then, the form shows a friendly "not connected yet" message instead
-   of silently failing (see `js/main.js`).
+At page load, `js/include.js`:
+1. Fetches `includes/header.html` and `includes/footer.html` and swaps them
+   into the two placeholder divs.
+2. Sets the `#current-year` footer text automatically.
+3. Only THEN loads the scripts listed in `data-then` (comma-separated, in
+   order) — so `main.js` never runs before the nav/footer it depends on
+   actually exist in the DOM.
 
-2. **Legal pages** — the footer links to `/privacy-policy.html`,
-   `/terms-and-conditions.html`, etc. Add these as plain `.html` files at the
-   site root (copy `404.html`'s `<head>`/header/footer as a starting
-   template) once you have real content for them.
+For pages that don't need the 3D hero (about, contact, legal, tools), just
+list fewer scripts: `data-then="/js/main.js"`.
 
-3. **OG image** — `index.html` references `/assets/og-image.jpg` for social
-   link previews; add a 1200×630 image at that path.
+**To change the nav or footer sitewide:** edit `includes/header.html` or
+`includes/footer.html` once — every page picks it up automatically, no
+rebuild, no redeploy step beyond your normal push.
 
-4. **Domain references** — canonical URL, sitemap, and JSON-LD all assume
-   `https://www.bitsserver.com`. Update if the final domain differs.
+### Trade-off worth knowing
+The previous header used a pure-CSS checkbox menu specifically so it kept
+working with JavaScript disabled. Because the header is now fetched by
+`include.js`, a page with JS disabled or blocked will show **no header or
+footer** rather than a working-but-unstyled one. If that resilience matters
+more to you than having a single shared file, the alternative is duplicating
+the header/footer markup in every page by hand — which was requirement #1
+you asked to move away from. Flag it if you'd rather I add a `<noscript>`
+fallback with a minimal inline nav.
 
-## Notes on resilience
-- The mobile menu is pure CSS (checkbox toggle) — works even if all
-  JavaScript fails.
-- The hero's WebGL scene fails silently if Three.js can't load (offline,
-  ad-blocker, old browser) — the ambient CSS gradient background behind it
-  still makes the hero look complete.
-- `prefers-reduced-motion` is respected: the 3D scene renders one static
-  frame instead of animating, and CSS entrance animations are skipped.
+## Coming-soon tools
+
+All tool pages live under `/tools/`. Add a new one:
+1. Copy `tools/_template.html` → `tools/your-tool-slug.html`
+2. Replace the `TOOL NAME` / `TOOL-SLUG` placeholders
+3. Add a card for it in `tools/index.html`
+4. Link to it from the homepage teaser if you want it featured
+
+## Office locations
+
+Both offices now appear in `includes/footer.html`, the homepage contact
+section, and the JSON-LD Organization schema in `index.html`:
+- **Headquarters:** Multan, Pakistan
+- **Zonal Office:** Abu Dhabi, UAE
+
+## Social links
+
+Every social icon link now uses `target="_blank" rel="noopener noreferrer"`.
+
+## CSS note
+
+`includes/footer.html` adds a `.footer-address-list` element for the two
+office locations. It inherits the existing footer `<ul>` styling by default;
+add this to `css/style.css` for tighter spacing if you like:
+
+```css
+.footer-address-list { list-style: none; padding: 0; margin: 10px 0 16px; }
+.footer-address-list li { margin-bottom: 6px; font-size: 14px; opacity: .85; }
+```
+
+## Still needed from you
+
+I only have the actual current content of `index.html` and `about.html`
+from your repo (fetched via GitHub's web view — no raw/API access from
+here). `contact.html` and the legal pages exist in your repo but I haven't
+seen their content, so I couldn't convert them in this pass. Upload them
+(or the whole repo as a zip) and I'll apply the same `data-include` swap,
+address updates, and `target="_blank"` fix to those too.
