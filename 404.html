@@ -10,14 +10,10 @@
 <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <header id="site-header">
-    <div class="container nav-wrap">
-      <a class="logo" href="/">
-        <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round" stroke-width="2"/></svg></span>
-        BitsServer<span class="neon-text">&nbsp;IT&nbsp;Lab</span>
-      </a>
-    </div>
-  </header>
+  <div id="scroll-progress"></div>
+<div id="cursor-glow"></div>
+
+<div data-include="/includes/header.html"></div>
   <main>
     <section class="page-banner">
       <div class="container">
@@ -30,10 +26,12 @@
       </div>
     </section>
   </main>
-  <footer id="site-footer">
-    <div class="container footer-bottom">
-      <span>&copy; 2026 BitsServer IT Lab. All rights reserved.</span>
-    </div>
-  </footer>
+
+<div data-include="/includes/footer.html"></div>
+
+<script src="/js/include.js" data-then="/js/main.js"></script>
+  
 </body>
 </html>
+
+
