@@ -444,3 +444,73 @@ section{ position:relative; padding:90px 0; overflow:hidden; }
 .page-banner{ padding:170px 0 50px; text-align:center; }
 .page-banner h1{ font-size:clamp(26px,5vw,48px); margin-bottom:12px; }
 .page-banner p{ color:var(--c-text-dim); }
+
+/* ==========================================================================
+   LEGAL / INNER CONTENT PAGES
+   Shared by About, Contact, Legal Hub, and every /legal/*.html document.
+   Two structural variants exist in the HTML (legal-toc/legal-content on
+   About & Contact & most legal pages; legal-sidebar/legal-nav/legal-card on
+   Privacy/Refund/Terms) — both are styled here so either markup works.
+   ========================================================================== */
+.legal-banner{ position:relative; padding:150px 0 60px; text-align:center; overflow:hidden; }
+@media (max-width:760px){ .legal-banner{ padding:128px 0 44px; } }
+.legal-banner .container{ position:relative; z-index:1; }
+.legal-banner .brand-watermark{ position:absolute; top:-30px; right:-10px; width:240px; height:240px; opacity:.05; pointer-events:none; z-index:0; }
+@media (max-width:760px){ .legal-banner .brand-watermark{ width:160px; height:160px; } }
+.legal-banner h1{ font-size:clamp(26px,5vw,48px); margin-bottom:14px; }
+.legal-banner > .container > p{ color:var(--c-text-dim); font-size:15px; max-width:620px; margin:0 auto; }
+
+.legal-meta{ display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-top:22px; }
+.legal-chip{ display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:50px; font-size:12.5px; color:var(--c-text-dim); }
+.legal-chip .dot{ width:7px; height:7px; border-radius:50%; background:var(--c-secondary); box-shadow:0 0 8px var(--c-secondary); flex-shrink:0; }
+
+#legal-body, #legal-content{ padding:70px 0 100px; }
+@media (max-width:760px){ #legal-body, #legal-content{ padding:44px 0 60px; } }
+
+.legal-layout{ display:grid; grid-template-columns:260px 1fr; gap:32px; align-items:start; }
+@media (max-width:900px){ .legal-layout{ grid-template-columns:1fr; } }
+
+.legal-toc, .legal-sidebar{ padding:26px 22px; position:sticky; top:110px; }
+@media (max-width:900px){ .legal-toc, .legal-sidebar{ position:static; } }
+.legal-toc h4, .legal-sidebar h4{ font-size:12.5px; text-transform:uppercase; letter-spacing:1px; color:var(--c-text-dim2); margin-bottom:16px; }
+.legal-toc ol{ display:flex; flex-direction:column; gap:11px; }
+.legal-toc ol a{ font-size:13.5px; color:var(--c-text-dim); transition:color .25s; }
+.legal-toc ol a:hover{ color:var(--c-secondary); }
+.legal-nav{ display:flex; flex-direction:column; gap:11px; }
+.legal-nav a{ font-size:13.5px; color:var(--c-text-dim); transition:color .25s; padding:4px 0; }
+.legal-nav a:hover, .legal-nav a.active{ color:var(--c-secondary); }
+
+.legal-content, .legal-card{ padding:38px 40px; }
+@media (max-width:600px){ .legal-content, .legal-card{ padding:24px 20px; } }
+.legal-content-body h2, .legal-card h2{ font-size:20px; margin:32px 0 14px; }
+.legal-content-body h2:first-child, .legal-card h2:first-child{ margin-top:0; }
+.legal-content-body h3, .legal-card h3{ font-size:16px; margin:20px 0 10px; }
+.legal-content-body p, .legal-card p{ color:var(--c-text-dim); font-size:14.5px; margin-bottom:14px; }
+.legal-content-body ul, .legal-card ul{ list-style:disc; padding-left:22px; margin-bottom:14px; }
+.legal-content-body li, .legal-card li{ font-size:14.5px; color:var(--c-text-dim); margin-bottom:8px; }
+.legal-content-body a, .legal-card a{ color:var(--c-secondary); text-decoration:underline; text-underline-offset:2px; }
+
+.legal-highlight{
+  padding:18px 22px; border-radius:14px; margin-bottom:30px; font-size:14.5px; color:var(--c-text-dim);
+  background:linear-gradient(135deg, rgba(10,132,255,.12), rgba(123,97,255,.12));
+  border-left:3px solid var(--c-secondary);
+}
+.legal-highlight strong{ color:var(--c-text); }
+
+.legal-section{ margin-bottom:34px; }
+.legal-section:last-child{ margin-bottom:0; }
+.legal-section h2{ display:flex; align-items:center; gap:12px; font-size:19px; margin-bottom:12px; }
+.legal-section p{ color:var(--c-text-dim); font-size:14.5px; }
+.legal-num{ font-family:var(--font-head); font-size:14px; font-weight:900; color:transparent; -webkit-text-stroke:1.2px var(--c-secondary); opacity:.7; flex-shrink:0; }
+
+.inline-link{ color:var(--c-secondary); text-decoration:underline; text-underline-offset:2px; transition:color .25s; }
+.inline-link:hover{ color:var(--c-primary); }
+
+/* ---------- Legal hub index cards ---------- */
+.legal-index-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:22px; }
+.legal-index-card{ display:block; padding:30px 26px; transition:transform .4s var(--ease), box-shadow .4s var(--ease), border-color .4s var(--ease); }
+.legal-index-card:hover{ transform:translateY(-6px); box-shadow:0 18px 36px rgba(10,132,255,.22), 0 0 26px rgba(0,229,255,.14); border-color:rgba(0,229,255,.4); }
+.legal-index-icon{ width:48px; height:48px; border-radius:13px; margin-bottom:16px; background:linear-gradient(135deg,rgba(10,132,255,.25),rgba(123,97,255,.25)); display:flex; align-items:center; justify-content:center; box-shadow:0 0 16px rgba(10,132,255,.2) inset; }
+.legal-index-icon svg{ width:23px; height:23px; stroke:var(--c-secondary); }
+.legal-index-card h3{ font-size:16px; margin-bottom:8px; }
+.legal-index-card p{ color:var(--c-text-dim); font-size:13.5px; }
