@@ -73,8 +73,16 @@
 </section>
 </main>
 
+<!-- ============ FOOTER ============ -->
 <div data-include="/includes/footer.html"></div>
 
-<script src="/js/include.js" data-then="/js/main.js"></script>
+<script src="/js/include.js"
+        data-then="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js,/js/hero-scene.js,/js/main.js">
+</script>
+  <!-- ============ FOOTER ============ -->
+
+<button aria-label="Back to top" id="back-to-top">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+</button>
 </body>
 </html>
