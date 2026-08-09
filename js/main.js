@@ -4,7 +4,115 @@
    the page is still complete — all text visible, mobile menu works via the
    pure-CSS checkbox toggle already in the HTML/CSS, all links work.
    ============================================================================ */
-document.addEventListener('DOMContentLoaded', function () {
+// Run once the DOM is ready. NOTE: this file is loaded dynamically by
+// js/include.js (via its "data-then" attribute) *after* header.html and
+// footer.html have already been fetched and spliced in — which itself only
+// happens after the page's own "DOMContentLoaded" event has already fired.
+// A plain `document.addEventListener('DOMContentLoaded', fn)` at that point
+// would register for an event that will never fire again, so everything
+// below would silently never run. This small helper checks readyState and
+// runs immediately when the document is already past the loading phase,
+// while still behaving like a normal DOMContentLoaded listener if this file
+// is ever loaded the conventional way (e.g. a future page includes it
+// directly via a static <script> tag before the document has finished
+// parsing).
+function bsReady(fn) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fn);
+  } else {
+    fn();
+  }
+}
+
+// ---- Theme system (light / dark / system) ----
+// Kept outside bsReady() and run immediately: the header/footer theme
+// controls are already in the DOM by the time this file executes (include.js
+// only loads main.js after both includes have been spliced in), and running
+// this first means the toggle/selector reflect the correct state as soon as
+// they appear rather than for one frame showing stale markup.
+(function () {
+  try {
+    var THEME_KEY = 'bitsserver-theme';
+    var root = document.documentElement;
+    var mql = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+
+    function getStored() {
+      try { return localStorage.getItem(THEME_KEY); } catch (err) { return null; }
+    }
+    function setStored(value) {
+      try { localStorage.setItem(THEME_KEY, value); } catch (err) { /* localStorage unavailable — theme still works for this page view */ }
+    }
+    function systemIsLight() {
+      return !!(mql && mql.matches);
+    }
+    function resolvedTheme(pref) {
+      if (pref === 'light' || pref === 'dark') return pref;
+      return systemIsLight() ? 'light' : 'dark';
+    }
+    function updateControls(pref) {
+      var active = resolvedTheme(pref);
+      var toggles = document.querySelectorAll('[data-theme-toggle]');
+      for (var i = 0; i < toggles.length; i++) {
+        var label = pref === 'system' ? 'Theme: System (currently ' + active + ')' : 'Theme: ' + active;
+        toggles[i].setAttribute('aria-label', label + '. Click to change.');
+        toggles[i].setAttribute('title', label + ' — click to change');
+      }
+      var options = document.querySelectorAll('[data-theme-option]');
+      for (var j = 0; j < options.length; j++) {
+        var isActive = options[j].getAttribute('data-theme-option') === pref;
+        options[j].classList.toggle('is-active', isActive);
+        options[j].setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      }
+    }
+    function applyTheme(pref) {
+      if (pref === 'light' || pref === 'dark') {
+        root.setAttribute('data-theme', pref);
+      } else {
+        // "system": remove the override so CSS's prefers-color-scheme
+        // media query takes back over automatically.
+        root.removeAttribute('data-theme');
+      }
+      updateControls(pref);
+    }
+
+    var stored = getStored();
+    if (stored !== 'light' && stored !== 'dark' && stored !== 'system') {
+      stored = 'system';
+    }
+    applyTheme(stored);
+
+    // Live-update while in "system" mode if the OS/browser theme changes.
+    function handleSystemChange() {
+      if ((getStored() || 'system') === 'system') applyTheme('system');
+    }
+    if (mql) {
+      if (mql.addEventListener) mql.addEventListener('change', handleSystemChange);
+      else if (mql.addListener) mql.addListener(handleSystemChange); // older Safari
+    }
+
+    // Header control: compact toggle, cycles System -> Light -> Dark -> System.
+    var cycleOrder = ['system', 'light', 'dark'];
+    document.addEventListener('click', function (e) {
+      var toggle = e.target.closest ? e.target.closest('[data-theme-toggle]') : null;
+      if (toggle) {
+        var now = getStored() || 'system';
+        var next = cycleOrder[(cycleOrder.indexOf(now) + 1) % cycleOrder.length];
+        setStored(next);
+        applyTheme(next);
+        return;
+      }
+      // Footer control: explicit System / Light / Dark buttons.
+      var option = e.target.closest ? e.target.closest('[data-theme-option]') : null;
+      if (option) {
+        var val = option.getAttribute('data-theme-option');
+        setStored(val);
+        applyTheme(val);
+      }
+    });
+  } catch (err) { /* theme system is a progressive enhancement — the page still renders via CSS defaults */ }
+})();
+
+bsReady(function () {
 
   // ---- Scroll progress bar + header shrink + back-to-top visibility ----
   try {
