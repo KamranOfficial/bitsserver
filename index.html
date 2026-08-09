@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- Inline, blocking, and intentionally tiny: sets the saved theme before CSS
+     paints so a manual Light/Dark choice never flashes the wrong theme for a
+     frame. Mirrors the "bitsserver-theme" logic in js/main.js. -->
+<script>(function(){try{var t=localStorage.getItem('bitsserver-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
 <title>BitsServer IT Lab — AI, Cloud &amp; Digital Innovation</title>
 <meta name="description" content="BitsServer IT Lab delivers AI automation, cloud infrastructure, VPS hosting, web &amp; mobile development, cybersecurity, and IT consulting for growing businesses." />
 <meta name="robots" content="index, follow" />

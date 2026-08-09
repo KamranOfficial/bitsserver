@@ -93,7 +93,59 @@ add this to `css/style.css` for tighter spacing if you like:
 .footer-address-list li { margin-bottom: 6px; font-size: 14px; opacity: .85; }
 ```
 
-## Still needed from you
+## Light / Dark / System theme
+
+A theme system now lives across the same shared files:
+
+- **`css/style.css`** — all design-system colors are CSS custom properties
+  (`--c-primary`, `--c-bg`, `--glass-bg`, etc.), plus a few new ones for
+  surfaces that were previously hardcoded (`--header-bg`, `--grid-line`,
+  `--glow-1/2/3`, `--input-bg`, `--card-shadow`...). Dark values live on
+  `:root` (unchanged from the original design). Light values apply two ways:
+  `@media (prefers-color-scheme: light)` for system detection, and
+  `[data-theme="light"]` / `[data-theme="dark"]` for a manual override —
+  the explicit attribute rules are written *after* the media query in the
+  file so they always win on a tie, letting a manual choice override the
+  system preference.
+- **`js/main.js`** — reads/writes `localStorage["bitsserver-theme"]`
+  (`"system"`, `"light"`, or `"dark"`). `"system"` means no `data-theme`
+  attribute is set, so the CSS media query above decides. Listens for OS
+  theme changes live while in `"system"` mode. Every localStorage call is
+  wrapped in try/catch, so the theme system degrades gracefully (falls back
+  to system/CSS-only behavior) if storage is blocked or unavailable.
+- **`includes/header.html`** — compact sun/moon toggle button
+  (`[data-theme-toggle]`) that cycles System → Light → Dark → System.
+- **`includes/footer.html`** — explicit System / Light / Dark buttons
+  (`[data-theme-option]`) so users can always get back to "follow my OS"
+  after picking one manually.
+- **Anti-flash inline script**: a ~150-byte inline `<script>` was added to
+  the `<head>` of `index.html`, `404.html`, `tools/index.html`, and
+  `tools/_template.html` (before anything else loads) that reads the saved
+  preference and sets `data-theme` before first paint. This was necessary
+  because `main.js` itself only runs after `include.js` finishes fetching
+  the header/footer over the network — too late to prevent a flash on its
+  own. **Any new page copied from `tools/_template.html` already includes
+  this snippet; keep it if you hand-roll a new page.**
+- **No JS? No problem.** With JavaScript disabled, there's no toggle, but
+  the site still follows the OS-level `prefers-color-scheme` automatically
+  via CSS alone.
+
+## Bug fix: `main.js` events were silently not running
+
+While wiring up the theme toggle I found that **`main.js`'s entire body was
+never executing** in production. It's loaded dynamically by `include.js`
+*after* `DOMContentLoaded` has already fired (since header.html/footer.html
+are fetched async first) — but the file wrapped everything in
+`document.addEventListener('DOMContentLoaded', ...)`, which registers for an
+event that had already fired and will never fire again. I verified this with
+a headless-browser test: the scroll progress bar, header shrink-on-scroll,
+mobile-menu auto-close-on-link-tap, active-nav-link highlighting, and stat
+counters were all inert. Fixed with a small `readyState`-aware `bsReady()`
+helper at the top of `main.js` that runs immediately if the document is
+already past the loading phase, or behaves like the old listener otherwise.
+Re-tested after the fix — all of the above now work as intended.
+
+
 
 I only have the actual current content of `index.html` and `about.html`
 from your repo (fetched via GitHub's web view — no raw/API access from
