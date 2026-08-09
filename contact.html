@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- Inline, blocking, and intentionally tiny: sets the saved theme before CSS
+     paints so a manual Light/Dark choice never flashes the wrong theme for a
+     frame. Mirrors the "bitsserver-theme" logic in js/main.js. -->
+<script>(function(){try{var t=localStorage.getItem('bitsserver-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
 <title>Contact Us — BitsServer IT Lab</title>
 <meta name="description" content="Get in touch with BitsServer IT Lab for AI, cloud, hosting, development, and cybersecurity inquiries." />
 <meta name="robots" content="index, follow" />
@@ -16,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&amp;family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/style.css?v=20260809" />
 </head>
 <body>
 <div id="scroll-progress"></div>
@@ -115,12 +119,11 @@
 </main>
 <!-- ============ FOOTER ============ -->
 <div data-include="/includes/footer.html"></div>
-<script src="/js/include.js" data-then="/js/main.js"></script>
+<script src="/js/include.js" data-then="/js/main.js?v=20260809"></script>
 <!-- ============ FOOTER ============ -->
   
 <button aria-label="Back to top" id="back-to-top">
   <svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
 </button>
-<script src="/js/main.js" defer></script>
 </body>
 </html>
