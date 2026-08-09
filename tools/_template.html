@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<!-- Inline, blocking, and intentionally tiny: sets the saved theme before CSS
+     paints so a manual Light/Dark choice never flashes the wrong theme for a
+     frame. Mirrors the "bitsserver-theme" logic in js/main.js. Keep this in
+     any new tool page copied from this template. -->
+<script>(function(){try{var t=localStorage.getItem('bitsserver-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
 <!-- EDIT: page title -->
 <title>TOOL NAME — Free Tools — BitsServer IT Lab</title>
 <meta name="description" content="TOOL NAME is coming soon from BitsServer IT Lab — a free browser-based IT utility." />
@@ -18,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&amp;family=Poppins:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/style.css?v=20260809" />
 </head>
 <body>
 <div id="scroll-progress"></div>
@@ -86,6 +91,6 @@ Placeholder description of what TOOL NAME will let visitors do once launched.
 
 <div data-include="/includes/footer.html"></div>
 
-<script src="/js/include.js" data-then="/js/main.js"></script>
+<script src="/js/include.js" data-then="/js/main.js?v=20260809"></script>
 </body>
 </html>

@@ -93,7 +93,25 @@ add this to `css/style.css` for tighter spacing if you like:
 .footer-address-list li { margin-bottom: 6px; font-size: 14px; opacity: .85; }
 ```
 
-## Light / Dark / System theme
+## ⚠️ Caching gotcha with `/css/*` and `/js/*`
+
+`_headers` sets `Cache-Control: public, max-age=604800, immutable` on
+`/css/*` and `/js/*` — a 7-day cache that browsers **never revalidate**,
+even on a hard refresh. Great for performance, but it means any future
+edit to `style.css` or `main.js` won't be visible to returning visitors
+(or even you, testing in the same browser) until that cache expires or you
+force a fresh copy.
+
+**Fix going forward:** bump the `?v=` query string on `style.css` and
+`main.js` (and `hero-scene.js` if you touch it) every time you change them —
+already done for this update (`?v=20260809`). A different-looking URL is a
+different cache entry, so the browser fetches it fresh regardless of the
+`immutable` header. `includes/header.html` and `includes/footer.html`
+aren't affected — they're fetched at runtime by `include.js` and aren't
+covered by the `/css/*` / `/js/*` rule, so those update immediately on
+every deploy without any versioning needed.
+
+
 
 A theme system now lives across the same shared files:
 
